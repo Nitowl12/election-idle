@@ -23,8 +23,8 @@ let quickerElectionsCost = 5;
 let richerVotersCost = 2;
 let betterOrganizationCost = 2;
 
-let blueVoteMoneyBonus = 0; // Base money earned by Blue voters
-let blackLineMoneyBonus = 0; // Base money earned per black line
+let blueVoteMoneyBonus = 1; // Base money earned by Blue voters
+let blackLineMoneyBonus = 1; // Base money earned per black line
 
 // Create voter elements
 const voterGrid = document.getElementById('voterGrid');
@@ -78,31 +78,9 @@ function displayVoterPreferences(voterIndex) {
     upgradeButton.textContent = `Upgrade Blue (+1 Weight) - $${voter.upgradeCost}`;
     upgradeButton.style.display = 'block'; // Make the button visible
     upgradeButton.onclick = () => upgradeVoterBlueWeight(voterIndex, upgradeButton);
-}
 
-// Function to upgrade Blue's weight
-function upgradeBlueWeight(button) {
-    const blueParty = gameState.parties.blue;
-
-    // Check if the player has enough money
-    if (gameState.money >= blueParty.upgradeCost) {
-        // Deduct the cost
-        gameState.money -= blueParty.upgradeCost;
-
-        // Increase Blue's vote weight
-        blueParty.weight += 1;
-
-        // Increase the upgrade cost (1.1x rounded up)
-        blueParty.upgradeCost = Math.ceil(blueParty.upgradeCost * 1.1);
-
-        // Update the button text
-        button.textContent = `Upgrade Blue (+1 Weight) - $${blueParty.upgradeCost}`;
-
-        // Update the display
-        updateDisplay();
-    } else {
-        alert("Not enough funds to upgrade!");
-    }
+    // Also let you upgrade Blue's weight directly
+    voter.onclick = () => upgradeVoterBlueWeight(voterIndex, upgradeButton);
 }
 
 // Function to upgrade a voter's Blue weight
@@ -256,7 +234,7 @@ function conductElection() {
                 party.votes++;
                 if (selectedParty === 'blue') {
                     gameState.votes++;
-                    gameState.money += 1 + blueVoteMoneyBonus; // Add bonus for Blue votes
+                    gameState.money += blueVoteMoneyBonus; // Add bonus for Blue votes
                 }
             }
 
@@ -405,7 +383,7 @@ function drawBlueConnections() {
                             ctx.stroke();
 
                             // Increment money for each line drawn
-                            moneyEarned += 1 + blackLineMoneyBonus; // Add bonus for black lines
+                            moneyEarned += blackLineMoneyBonus; // Add bonus for black lines
                         }
                     }
                 });
