@@ -740,8 +740,8 @@ function upgradeQuickerElections() {
         gameState.baseVoteTimer = Math.max(0.5, gameState.baseVoteTimer - 0.5); // Minimum timer is 0.5s
         updateVoteTimer();
 
-        // Increase the cost (x3)
-        gameState.quickerElectionsCost *= 3;
+        // Increase the cost (x2)
+        gameState.quickerElectionsCost *= 2;
 
         // Update the UI
         document.getElementById('quickerElectionsCost').textContent = gameState.quickerElectionsCost;
