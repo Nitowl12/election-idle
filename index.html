@@ -3,24 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Political Influence Idle Game</title>
+    <title>Vote Fraud Game</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="game-container">
-        <h1>Political Influence Idle Game</h1>
+        <h1>Vote Fraud Game</h1>
         
         <div class="resource-display">
             <div>
                 <strong>Your Votes:</strong> <span id="votes">0</span>
                 <br>
-                <small>Win Chance: <span id="winChance">5</span>%</small>
             </div>
             <div>
                 <strong>Campaign Funds:</strong> $<span id="money">0</span>
             </div>
             <div>
                 <strong>Vote Timer:</strong> <span id="timer">10.0</span>s
+            </div>
+            <div>
+                <strong>Perfect Elections:</strong> <span id="perfectElections">0</span>/10
             </div>
         </div>
         
@@ -32,8 +34,7 @@
         <div class="voter-container">
             <canvas id="connectionCanvas" style="position: absolute; z-index: 0;"></canvas>
             <div class="voter-grid" id="voterGrid">
-                <!-- Voters will be added by JavaScript -->
-            </div>
+                </div>
             <div class="voter-info-panel" id="voterInfoPanel">
                 <h3>Voter Preferences</h3>
                 <p>Select a voter to see their preferences.</p>
@@ -47,8 +48,7 @@
                         </tr>
                     </thead>
                     <tbody id="voterPreferences">
-                        <!-- Preferences will be dynamically added here -->
-                    </tbody>
+                        </tbody>
                 </table>
                 <button id="upgradeBlueButton" style="margin-top: 10px; display: none;">Upgrade Blue (+1 Weight) - $1</button>
             </div>
@@ -84,6 +84,51 @@
                     <div class="upgrade-effect">Current Reward: $<span id="betterOrganizationEffect">0</span></div>
                 </div>
                 <button onclick="upgradeBetterOrganization()">Upgrade</button>
+            </div>
+            <div class="upgrade" id="perfectDistrict" style="display: none;">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Perfect District</div>
+                    <div class="upgrade-description">Increase money earned by 5 Blue voters in a row by $5.</div>
+                    <div class="upgrade-cost">Cost: $<span id="perfectDistrictCost">256</span></div>
+                    <div class="upgrade-effect">Current Reward: $<span id="perfectDistrictEffect">5</span></div>
+                </div>
+                <button onclick="upgradePerfectDistrict()">Upgrade</button>
+            </div>
+            <div class="upgrade" id="assassinateRed" style="display: none;">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Assassinate Red</div>
+                    <div class="upgrade-description">Set Red's vote weight to 0.</div>
+                    <div class="upgrade-cost">Cost: $<span id="assassinateRedCost">10000</span></div>
+                    <div class="upgrade-effect">Red Weight: <span id="assassinateRedEffect">10</span></div>
+                </div>
+                <button onclick="assassinateRed()">Purchase</button>
+            </div>
+            <div class="upgrade" id="assassinateGreen" style="display: none;">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Assassinate Green</div>
+                    <div class="upgrade-description">Set Green's vote weight to 0.</div>
+                    <div class="upgrade-cost">Cost: $<span id="assassinateGreenCost">15000</span></div>
+                    <div class="upgrade-effect">Green Weight: <span id="assassinateGreenEffect">15</span></div>
+                </div>
+                <button onclick="assassinateGreen()">Purchase</button>
+            </div>
+            <div class="upgrade" id="assassinateYellowKids" style="display: none;">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Assassinate Yellow's Kids</div>
+                    <div class="upgrade-description">Half Yellow's vote weight.</div>
+                    <div class="upgrade-cost">Cost: $<span id="assassinateYellowKidsCost">15000</span></div>
+                    <div class="upgrade-effect">Yellow Weight: <span id="assassinateYellowKidsEffect">20</span></div>
+                </div>
+                <button onclick="assassinateYellowKids()">Purchase</button>
+            </div>
+            <div class="upgrade" id="assassinateYellowWife" style="display: none;">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Assassinate Yellow's Wife</div>
+                    <div class="upgrade-description">Half Yellow's vote weight.</div>
+                    <div class="upgrade-cost">Cost: $<span id="assassinateYellowWifeCost">20000</span></div>
+                    <div class="upgrade-effect">Yellow Weight: <span id="assassinateYellowWifeEffect">20</span></div>
+                </div>
+                <button onclick="assassinateYellowWife()">Purchase</button>
             </div>
         </div>
 

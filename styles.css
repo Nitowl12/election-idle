@@ -154,3 +154,26 @@ h1 {
     border-radius: 5px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
+
+/* Style for Assassinate Red and Assassinate Green upgrades */
+#assassinateRed,
+#assassinateGreen,
+/* NEW: Style for Assassinate Yellow upgrades */
+#assassinateYellowKids,
+#assassinateYellowWife {
+    background-color: #F44336; /* Red */
+    color: white;
+    border-color: #D32F2F; /* Darker red border */
+}
+
+#assassinateRed .upgrade-description,
+#assassinateGreen .upgrade-description,
+#assassinateRed .upgrade-cost,
+#assassinateGreen .upgrade-cost,
+/* NEW: Ensure text inside Yellow upgrades is also white for contrast */
+#assassinateYellowKids .upgrade-description,
+#assassinateYellowKids .upgrade-cost,
+#assassinateYellowWife .upgrade-description,
+#assassinateYellowWife .upgrade-cost {
+    color: white;
+}
