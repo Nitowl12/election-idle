@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Political Influence Idle Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>Political Influence Idle Game</h1>
+        
+        <div class="resource-display">
+            <div>
+                <strong>Your Votes:</strong> <span id="votes">0</span>
+                <br>
+                <small>Win Chance: <span id="winChance">5</span>%</small>
+            </div>
+            <div>
+                <strong>Campaign Funds:</strong> $<span id="money">0</span>
+            </div>
+            <div>
+                <strong>Vote Timer:</strong> <span id="timer">10.0</span>s
+            </div>
+        </div>
+        
+        <div class="vote-info">
+            <div>Next election in: <span id="nextElection">5.0</span> seconds</div>
+            <div>Party Votes: <span id="partyVotes">●: 0 | X: 0 | ▲: 0 | ■: 0</span></div>
+        </div>
+        
+        <div class="voter-container">
+            <canvas id="connectionCanvas" style="position: absolute; z-index: 0;"></canvas>
+            <div class="voter-grid" id="voterGrid">
+                <!-- Voters will be added by JavaScript -->
+            </div>
+            <div class="voter-info-panel" id="voterInfoPanel">
+                <h3>Voter Preferences</h3>
+                <p>Select a voter to see their preferences.</p>
+                <table id="voterPreferencesTable" border="1" style="width: 100%; text-align: left;">
+                    <thead>
+                        <tr>
+                            <th>Party</th>
+                            <th>Symbol</th>
+                            <th>Vote Weight</th>
+                            <th>Probability</th>
+                        </tr>
+                    </thead>
+                    <tbody id="voterPreferences">
+                        <!-- Preferences will be dynamically added here -->
+                    </tbody>
+                </table>
+                <button id="upgradeBlueButton" style="margin-top: 10px; display: none;">Upgrade Blue (+1 Weight) - $1</button>
+            </div>
+        </div>
+
+        <div class="upgrade-panel" id="upgradePanel">
+            <h3>Upgrades</h3>
+            <div class="upgrade" id="quickerElections">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Quicker Elections</div>
+                    <div class="upgrade-description">Decrease election timer by -0.5s.</div>
+                    <div class="upgrade-cost">Cost: $<span id="quickerElectionsCost">5</span></div>
+                    <div class="upgrade-effect">Current Timer: <span id="quickerElectionsEffect">10.0s</span></div>
+                </div>
+                <button onclick="upgradeQuickerElections()">Upgrade</button>
+            </div>
+            <div class="upgrade" id="richerVoters">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Richer Voters</div>
+                    <div class="upgrade-description">Increase money earned by Blue voters by $1.</div>
+                    <div class="upgrade-cost">Cost: $<span id="richerVotersCost">2</span></div>
+                    <div class="upgrade-effect">Current Reward: $<span id="richerVotersEffect">0</span></div>
+                </div>
+                <button onclick="upgradeRicherVoters()">Upgrade</button>
+            </div>
+            <div class="upgrade" id="betterOrganization">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Better Organization</div>
+                    <div class="upgrade-description">Increase money earned per adjacent Blue voters by $1.</div>
+                    <div class="upgrade-cost">Cost: $<span id="betterOrganizationCost">2</span></div>
+                    <div class="upgrade-effect">Current Reward: $<span id="betterOrganizationEffect">0</span></div>
+                </div>
+                <button onclick="upgradeBetterOrganization()">Upgrade</button>
+            </div>
+        </div>
+
+        <button id="resetButton" onclick="resetGame()">Reset Everything</button>
+    </div>
+
+    <script src="myscripts.js"></script> 
+</body>
+</html>

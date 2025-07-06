@@ -1,0 +1,168 @@
+body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+.game-container {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+.resource-display {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #e9f7ef;
+    border-radius: 5px;
+}
+.upgrade-panel {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+.upgrade {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+.upgrade-info {
+    flex-grow: 1;
+    margin-right: 10px;
+}
+.upgrade-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.upgrade-description {
+    font-size: 0.9em;
+    color: #666;
+}
+.upgrade-cost {
+    font-weight: bold;
+    color: #2e7d32;
+}
+h1 {
+    color: #2e7d32;
+    text-align: center;
+}
+.tab {
+    display: none;
+}
+.tab.active {
+    display: block;
+}
+.tab-buttons {
+    display: none;
+}
+.tab-button {
+    flex: 1;
+    padding: 10px;
+    background-color: #ddd;
+    border: none;
+    cursor: pointer;
+}
+.tab-button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+.voter-container {
+    display: flex;
+    gap: 20px;
+    position: relative;
+}
+.voter-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 20px 0;
+}
+.voter {
+    width: 40px;
+    height: 40px;
+    background-color: #ddd;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    transition: all 0.3s;
+    cursor: pointer;
+    border: none;
+}
+.voter.yours {
+    background-color: #4CAF50;
+    color: white;
+}
+.voter.opponent {
+    background-color: #f44336;
+    color: white;
+}
+.voter.blue {
+    background-color: #2196F3; /* Blue */
+    color: white;
+}
+.voter.red {
+    background-color: #F44336; /* Red */
+    color: white;
+}
+.voter.green {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+.voter.yellow {
+    background-color: #FFEB3B; /* Yellow */
+    color: black;
+}
+.voter-info-panel {
+    flex: 1;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+.voter-info-panel h3 {
+    margin-top: 0;
+}
+.voter-info-panel ul {
+    list-style: none;
+    padding: 0;
+}
+.voter-info-panel li {
+    margin-bottom: 5px;
+}
+.vote-info {
+    text-align: center;
+    margin-bottom: 15px;
+}
+.upgrade-panel {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
