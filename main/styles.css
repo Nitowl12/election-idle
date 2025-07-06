@@ -69,26 +69,6 @@ h1 {
     color: #2e327d;
     text-align: center;
 }
-.tab {
-    display: none;
-}
-.tab.active {
-    display: block;
-}
-.tab-buttons {
-    display: none;
-}
-.tab-button {
-    flex: 1;
-    padding: 10px;
-    background-color: #ddd;
-    border: none;
-    cursor: pointer;
-}
-.tab-button.active {
-    background-color: #4C50AF;
-    color: white;
-}
 .voter-container {
     display: flex;
     gap: 20px;
