@@ -114,6 +114,22 @@ h1 {
     cursor: pointer;
     border: none;
 }
+.voter-probability {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    font-size: 0.7em;
+    color: white;
+    background-color: rgba(0, 0, 255, 0.8);
+    padding: 2px 5px;
+    border-radius: 4px;
+    z-index: 10;
+    min-width: 25px;
+    text-align: center;
+    line-height: 1;
+    pointer-events: none;
+    opacity: 0.7;
+}
 .voter.blue {
     background-color: #2196F3; /* Blue */
     color: white;

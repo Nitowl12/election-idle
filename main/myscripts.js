@@ -21,9 +21,11 @@ let gameState = {
     richerVotersCost: 2,
     betterOrganizationCost: 2,
     blueVoteMoneyBonus: 1, // Base money earned by Blue voters
-    blackLineMoneyBonus: 1 // Base money earned per black line
+    blackLineMoneyBonus: 1, // Base money earned per black line
+    showProbabilities: false // NEW: Default to showing probabilities
 };
 
+let selectedVoterIndex = null; // To store the index of the currently selected voter
 
 // Create voter elements
 const voterGrid = document.getElementById('voterGrid');
@@ -35,21 +37,69 @@ for (let i = 0; i < 25; i++) {
     voterContainer.style.display = 'flex';
     voterContainer.style.flexDirection = 'column';
     voterContainer.style.alignItems = 'center';
+    voterContainer.classList.add('voter-container'); // Add this class for CSS positioning
 
     const voter = document.createElement('button');
     voter.className = 'voter';
     voter.id = `voter-${i}`;
     voter.textContent = '?';
 
-    // Add click event to display voter preferences
-    voter.addEventListener('click', () => displayVoterPreferences(i));
+    // --- NEW: Create and append probability span ---
+    const probabilitySpan = document.createElement('span');
+    probabilitySpan.classList.add('voter-probability');
+    probabilitySpan.id = `voter-prob-${i}`; // Add ID for easy access
+    voterContainer.appendChild(probabilitySpan); // Append the span to the container
+
+    // Add click event to display voter preferences or upgrade
+    voter.addEventListener('click', () => {
+        if (selectedVoterIndex === i) {
+            // If the same voter is clicked again, attempt to upgrade
+            const upgradeButton = document.getElementById('upgradeBlueButton');
+            upgradeVoterBlueWeight(i, upgradeButton); // Call the upgrade function
+        } else {
+            // Otherwise, select this voter and display preferences
+            displayVoterPreferences(i);
+        }
+    });
 
     voterContainer.appendChild(voter);
     voterGrid.appendChild(voterContainer);
 }
 
+// Function to calculate and update the blue probability for a specific voter's display
+function updateVoterProbabilityDisplay(voterIndex) {
+    const voterData = gameState.voters[voterIndex];
+    const partyKeys = Object.keys(gameState.parties);
+
+    // Calculate total weight for the specific voter
+    const totalWeight = partyKeys.reduce((sum, key) => {
+        return sum + (key === 'blue' ? voterData.blueWeight : gameState.parties[key].weight);
+    }, 0);
+
+    const blueWeight = voterData.blueWeight;
+    // Calculate probability and round to nearest whole number, then convert to string
+    const blueProbability = totalWeight > 0 ? ((blueWeight / totalWeight) * 100).toFixed(0) : 0;
+
+    const probabilitySpan = document.getElementById(`voter-prob-${voterIndex}`);
+    if (probabilitySpan) {
+        probabilitySpan.textContent = `${blueProbability}%`;
+        // --- NEW: Toggle visibility based on gameState.showProbabilities ---
+        probabilitySpan.style.display = gameState.showProbabilities ? 'block' : 'none';
+    }
+}
+
+// Function to update all voter probabilities (useful after elections or global changes)
+function updateAllVoterProbabilitiesDisplay() {
+    for (let i = 0; i < gameState.voters.length; i++) {
+        updateVoterProbabilityDisplay(i);
+    }
+}
+
+
 // Function to display voter preferences
 function displayVoterPreferences(voterIndex) {
+    selectedVoterIndex = voterIndex; // Store the selected voter index
+
     const partyKeys = Object.keys(gameState.parties);
     const voter = gameState.voters[voterIndex]; // Get the selected voter
     const totalWeight = partyKeys.reduce((sum, key) => {
@@ -91,20 +141,29 @@ function upgradeVoterBlueWeight(voterIndex, button) {
         // Increase the voter's Blue weight
         voter.blueWeight += 1;
 
-        // Increase the upgrade cost (1.2x rounded up)
-        voter.upgradeCost = Math.ceil(voter.upgradeCost * 1.2);
+        // Increase the upgrade cost (1.1x rounded up)
+        voter.upgradeCost = Math.ceil(voter.upgradeCost * 1.1);
 
-        // Update the button text
-        button.textContent = `Upgrade Blue (+1 Weight) - $${voter.upgradeCost}`;
+        // Update the button text (even if null, it won't throw error)
+        if (button) { // Ensure button exists before trying to update its text
+            button.textContent = `Upgrade Blue (+1 Weight) - $${voter.upgradeCost}`;
+        }
 
-        // Update the display
+        // Update the display (money, etc.)
         updateDisplay();
 
         // Draw connections between Blue voters
         drawBlueConnections();
 
-        // Recalculate and update voter preferences
-        displayVoterPreferences(voterIndex);
+        // Update the probability display for this specific voter
+        updateVoterProbabilityDisplay(voterIndex);
+
+        // Recalculate and update voter preferences (important for money to show immediately)
+        // Only update if this voter is still the selected one, to avoid changing panel
+        if (selectedVoterIndex === voterIndex) {
+            displayVoterPreferences(voterIndex);
+        }
+
     } else {
         alert("Not enough funds to upgrade!");
     }
@@ -116,7 +175,8 @@ function loadGame() {
     if (saved) {
         const parsed = JSON.parse(saved);
         if (parsed) {
-            gameState = parsed;
+            // Merge loaded state with default to ensure new properties exist
+            gameState = { ...gameState, ...parsed };
             gameState.lastUpdate = Date.now();
             updateVoteTimer();
         }
@@ -141,7 +201,6 @@ function calculateVoteTimer() {
 }
 
 // Update the display
-// Update the display
 function updateDisplay() {
     document.getElementById('votes').textContent = gameState.votes.toLocaleString();
     document.getElementById('money').textContent = gameState.money.toLocaleString();
@@ -159,7 +218,7 @@ function updateDisplay() {
     document.getElementById('richerVotersEffect').textContent = `${gameState.blueVoteMoneyBonus}`;
     document.getElementById('betterOrganizationEffect').textContent = `${gameState.blackLineMoneyBonus}`;
 
-    // ADD THESE LINES TO UPDATE THE UPGRADE COSTS ON THE UI
+    // Update the UI for upgrade costs
     document.getElementById('quickerElectionsCost').textContent = gameState.quickerElectionsCost;
     document.getElementById('richerVotersCost').textContent = gameState.richerVotersCost;
     document.getElementById('betterOrganizationCost').textContent = gameState.betterOrganizationCost;
@@ -182,16 +241,16 @@ function conductElection() {
     // Function to process each voter with a delay
     function processVoter(index) {
         if (index >= voters.length) {
-            // Draw connections between Blue voters
-            drawBlueConnections();
+            // After all voters have been processed
+            drawBlueConnections(); // Draw connections
+            updateDisplay();      // Update main display elements
+            saveGame();           // Save game state
 
-            // Update the display after all voters have been processed
-            updateDisplay();
-            saveGame();
+            // Update all voter probabilities after the election
+            updateAllVoterProbabilitiesDisplay();
 
-            // Reset the timer to the current voteTimer value
+            // Reset timer and resume game loop
             gameState.timeUntilVote = gameState.voteTimer;
-
             gameState.lastUpdate = Date.now();
             isElectionInProgress = false; // Resume the timer
             return;
@@ -289,43 +348,56 @@ function openTab(tabName) {
     event.currentTarget.classList.add('active');
 }
 
+// --- NEW: Function to toggle probability display ---
+function toggleProbabilityDisplay() {
+    gameState.showProbabilities = !gameState.showProbabilities; // Toggle the state
+    updateAllVoterProbabilitiesDisplay(); // Update all voter displays
+    saveGame(); // Save the new state
+}
+
 // Reset the game
 function resetGame() {
-    //if (confirm("Are you sure you want to reset everything? This action cannot be undone.")) {
-    // Reset game state to initial values
-    gameState = {
-        votes: 0,
-        money: 0,
-        winChance: 5,
-        baseVoteTimer: 10,
-        voteTimer: 10,
-        timeUntilVote: 10,
-        lastUpdate: Date.now(),
-        parties: {
-            blue: { symbol: '●', weight: 5, votes: 0 },
-            red: { symbol: '✖', weight: 10, votes: 0 },
-            green: { symbol: '▲', weight: 15, votes: 0 },
-            yellow: { symbol: '■', weight: 20, votes: 0 }
-        },
-        voters: Array.from({ length: 25 }, () => ({
-            blueWeight: 5, // Initial weight for Blue
-            upgradeCost: 1 // Initial upgrade cost
-        })),
-        quickerElectionsCost: 5,
-        richerVotersCost: 2,
-        betterOrganizationCost: 2,
-        blueVoteMoneyBonus: 1,
-        blackLineMoneyBonus: 1
-    };
+    if (confirm("Are you sure you want to reset everything? This action cannot be undone.")) {
+        // Reset game state to initial values
+        gameState = {
+            votes: 0,
+            money: 0,
+            winChance: 5,
+            baseVoteTimer: 10,
+            voteTimer: 10,
+            timeUntilVote: 10,
+            lastUpdate: Date.now(),
+            parties: {
+                blue: { symbol: '●', weight: 5, votes: 0 },
+                red: { symbol: '✖', weight: 10, votes: 0 },
+                green: { symbol: '▲', weight: 15, votes: 0 },
+                yellow: { symbol: '■', weight: 20, votes: 0 }
+            },
+            voters: Array.from({ length: 25 }, () => ({
+                blueWeight: 5, // Initial weight for Blue
+                upgradeCost: 1 // Initial upgrade cost
+            })),
+            quickerElectionsCost: 5,
+            richerVotersCost: 2,
+            betterOrganizationCost: 2,
+            blueVoteMoneyBonus: 1,
+            blackLineMoneyBonus: 1,
+            showProbabilities: false // Reset to default true on game reset
+        };
 
-    // Clear localStorage
-    localStorage.removeItem('politicalGameV2');
+        selectedVoterIndex = null; // Reset selected voter index
 
-    // Update the display
-    updateDisplay();
+        // Clear localStorage
+        localStorage.removeItem('politicalGameV2');
 
-    alert("Game has been reset!");
-    //}
+        // Update the display
+        updateDisplay();
+        // Update all voter probabilities after reset
+        updateAllVoterProbabilitiesDisplay();
+
+        alert("Game has been reset!");
+        //}
+    }
 }
 
 // Resize canvas to fit voter grid
@@ -342,7 +414,7 @@ function resizeCanvas() {
 function drawBlueConnections() {
     const canvas = document.getElementById('connectionCanvas');
     const ctx = canvas.getContext('2d');
-    const gridSize = 5; // Assuming a 5x5 grid
+    const gridSize = 5;
 
     // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -409,6 +481,8 @@ function drawBlueConnections() {
 function init() {
     loadGame();
     updateDisplay();
+    // Initial update of all voter probabilities on load
+    updateAllVoterProbabilitiesDisplay();
     gameLoop();
 }
 
@@ -417,6 +491,8 @@ window.onload = () => {
     init();
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
+    // --- NEW: Attach event listener to the toggle button ---
+    document.getElementById('toggleProbabilitiesButton').addEventListener('click', toggleProbabilityDisplay);
 };
 
 function upgradeQuickerElections() {
@@ -428,8 +504,8 @@ function upgradeQuickerElections() {
         gameState.baseVoteTimer = Math.max(0.5, gameState.baseVoteTimer - 0.5); // Minimum timer is 0.5s
         updateVoteTimer();
 
-        // Increase the cost (x5)
-        gameState.quickerElectionsCost *= 5;
+        // Increase the cost (x4)
+        gameState.quickerElectionsCost *= 4;
 
         // Update the UI
         document.getElementById('quickerElectionsCost').textContent = gameState.quickerElectionsCost;
