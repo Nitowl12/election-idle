@@ -16,15 +16,14 @@ let gameState = {
     voters: Array.from({ length: 25 }, () => ({
         blueWeight: 5, // Initial weight for Blue
         upgradeCost: 1 // Initial upgrade cost
-    }))
+    })),
+    quickerElectionsCost: 5,
+    richerVotersCost: 2,
+    betterOrganizationCost: 2,
+    blueVoteMoneyBonus: 1, // Base money earned by Blue voters
+    blackLineMoneyBonus: 1 // Base money earned per black line
 };
 
-let quickerElectionsCost = 5;
-let richerVotersCost = 2;
-let betterOrganizationCost = 2;
-
-let blueVoteMoneyBonus = 1; // Base money earned by Blue voters
-let blackLineMoneyBonus = 1; // Base money earned per black line
 
 // Create voter elements
 const voterGrid = document.getElementById('voterGrid');
@@ -78,9 +77,6 @@ function displayVoterPreferences(voterIndex) {
     upgradeButton.textContent = `Upgrade Blue (+1 Weight) - $${voter.upgradeCost}`;
     upgradeButton.style.display = 'block'; // Make the button visible
     upgradeButton.onclick = () => upgradeVoterBlueWeight(voterIndex, upgradeButton);
-
-    // Also let you upgrade Blue's weight directly
-    voter.onclick = () => upgradeVoterBlueWeight(voterIndex, upgradeButton);
 }
 
 // Function to upgrade a voter's Blue weight
@@ -145,6 +141,7 @@ function calculateVoteTimer() {
 }
 
 // Update the display
+// Update the display
 function updateDisplay() {
     document.getElementById('votes').textContent = gameState.votes.toLocaleString();
     document.getElementById('money').textContent = gameState.money.toLocaleString();
@@ -159,8 +156,13 @@ function updateDisplay() {
 
     // Update upgrade effects
     document.getElementById('quickerElectionsEffect').textContent = `${gameState.baseVoteTimer.toFixed(1)}s`;
-    document.getElementById('richerVotersEffect').textContent = `${blueVoteMoneyBonus}`;
-    document.getElementById('betterOrganizationEffect').textContent = `${blackLineMoneyBonus}`;
+    document.getElementById('richerVotersEffect').textContent = `${gameState.blueVoteMoneyBonus}`;
+    document.getElementById('betterOrganizationEffect').textContent = `${gameState.blackLineMoneyBonus}`;
+
+    // ADD THESE LINES TO UPDATE THE UPGRADE COSTS ON THE UI
+    document.getElementById('quickerElectionsCost').textContent = gameState.quickerElectionsCost;
+    document.getElementById('richerVotersCost').textContent = gameState.richerVotersCost;
+    document.getElementById('betterOrganizationCost').textContent = gameState.betterOrganizationCost;
 }
 
 // Update vote timer when upgrades change it
@@ -234,7 +236,7 @@ function conductElection() {
                 party.votes++;
                 if (selectedParty === 'blue') {
                     gameState.votes++;
-                    gameState.money += blueVoteMoneyBonus; // Add bonus for Blue votes
+                    gameState.money += gameState.blueVoteMoneyBonus; // Add bonus for Blue votes
                 }
             }
 
@@ -275,10 +277,10 @@ function openTab(tabName) {
     for (let i = 0; i < tabs.length; i++) {
         tabs[i].classList.remove('active');
     }
-    
+
     // Show selected tab
     document.getElementById(tabName).classList.add('active');
-    
+
     // Update tab buttons
     const tabButtons = document.getElementsByClassName('tab-button');
     for (let i = 0; i < tabButtons.length; i++) {
@@ -290,34 +292,39 @@ function openTab(tabName) {
 // Reset the game
 function resetGame() {
     //if (confirm("Are you sure you want to reset everything? This action cannot be undone.")) {
-        // Reset game state to initial values
-        gameState = {
-            votes: 0,
-            money: 0,
-            winChance: 5,
-            baseVoteTimer: 10,
-            voteTimer: 10,
-            timeUntilVote: 10,
-            lastUpdate: Date.now(),
-            parties: {
-                blue: { symbol: '●', weight: 5, votes: 0 },
-                red: { symbol: '✖', weight: 10, votes: 0 },
-                green: { symbol: '▲', weight: 15, votes: 0 },
-                yellow: { symbol: '■', weight: 20, votes: 0 }
-            },
-            voters: Array.from({ length: 25 }, () => ({
-                blueWeight: 5, // Initial weight for Blue
-                upgradeCost: 1 // Initial upgrade cost
-            }))
-        };
+    // Reset game state to initial values
+    gameState = {
+        votes: 0,
+        money: 0,
+        winChance: 5,
+        baseVoteTimer: 10,
+        voteTimer: 10,
+        timeUntilVote: 10,
+        lastUpdate: Date.now(),
+        parties: {
+            blue: { symbol: '●', weight: 5, votes: 0 },
+            red: { symbol: '✖', weight: 10, votes: 0 },
+            green: { symbol: '▲', weight: 15, votes: 0 },
+            yellow: { symbol: '■', weight: 20, votes: 0 }
+        },
+        voters: Array.from({ length: 25 }, () => ({
+            blueWeight: 5, // Initial weight for Blue
+            upgradeCost: 1 // Initial upgrade cost
+        })),
+        quickerElectionsCost: 5,
+        richerVotersCost: 2,
+        betterOrganizationCost: 2,
+        blueVoteMoneyBonus: 1,
+        blackLineMoneyBonus: 1
+    };
 
-        // Clear localStorage
-        localStorage.removeItem('politicalGameV2');
+    // Clear localStorage
+    localStorage.removeItem('politicalGameV2');
 
-        // Update the display
-        updateDisplay();
+    // Update the display
+    updateDisplay();
 
-        alert("Game has been reset!");
+    alert("Game has been reset!");
     //}
 }
 
@@ -383,7 +390,7 @@ function drawBlueConnections() {
                             ctx.stroke();
 
                             // Increment money for each line drawn
-                            moneyEarned += blackLineMoneyBonus; // Add bonus for black lines
+                            moneyEarned += gameState.blackLineMoneyBonus; // Add bonus for black lines
                         }
                     }
                 });
@@ -413,19 +420,19 @@ window.onload = () => {
 };
 
 function upgradeQuickerElections() {
-    if (gameState.money >= quickerElectionsCost) {
+    if (gameState.money >= gameState.quickerElectionsCost) {
         // Deduct the cost
-        gameState.money -= quickerElectionsCost;
+        gameState.money -= gameState.quickerElectionsCost;
 
         // Decrease the election timer
         gameState.baseVoteTimer = Math.max(0.5, gameState.baseVoteTimer - 0.5); // Minimum timer is 0.5s
         updateVoteTimer();
 
         // Increase the cost (x5)
-        quickerElectionsCost *= 5;
+        gameState.quickerElectionsCost *= 5;
 
         // Update the UI
-        document.getElementById('quickerElectionsCost').textContent = quickerElectionsCost;
+        document.getElementById('quickerElectionsCost').textContent = gameState.quickerElectionsCost;
         document.getElementById('quickerElectionsEffect').textContent = `${gameState.baseVoteTimer.toFixed(1)}s`;
         updateDisplay();
     } else {
@@ -434,19 +441,19 @@ function upgradeQuickerElections() {
 }
 
 function upgradeRicherVoters() {
-    if (gameState.money >= richerVotersCost) {
+    if (gameState.money >= gameState.richerVotersCost) {
         // Deduct the cost
-        gameState.money -= richerVotersCost;
+        gameState.money -= gameState.richerVotersCost;
 
         // Increase money earned by Blue voters
-        blueVoteMoneyBonus += 1;
+        gameState.blueVoteMoneyBonus += 1;
 
         // Increase the cost (x2)
-        richerVotersCost *= 2;
+        gameState.richerVotersCost *= 2;
 
         // Update the UI
-        document.getElementById('richerVotersCost').textContent = richerVotersCost;
-        document.getElementById('richerVotersEffect').textContent = `$${blueVoteMoneyBonus}`;
+        document.getElementById('richerVotersCost').textContent = gameState.richerVotersCost;
+        document.getElementById('richerVotersEffect').textContent = `$${gameState.blueVoteMoneyBonus}`;
         updateDisplay();
     } else {
         alert("Not enough funds to upgrade!");
@@ -454,19 +461,19 @@ function upgradeRicherVoters() {
 }
 
 function upgradeBetterOrganization() {
-    if (gameState.money >= betterOrganizationCost) {
+    if (gameState.money >= gameState.betterOrganizationCost) {
         // Deduct the cost
-        gameState.money -= betterOrganizationCost;
+        gameState.money -= gameState.betterOrganizationCost;
 
         // Increase money earned per black line
-        blackLineMoneyBonus += 1;
+        gameState.blackLineMoneyBonus += 1;
 
         // Increase the cost (x2)
-        betterOrganizationCost *= 2;
+        gameState.betterOrganizationCost *= 2;
 
         // Update the UI
-        document.getElementById('betterOrganizationCost').textContent = betterOrganizationCost;
-        document.getElementById('betterOrganizationEffect').textContent = `$${blackLineMoneyBonus}`;
+        document.getElementById('betterOrganizationCost').textContent = gameState.betterOrganizationCost;
+        document.getElementById('betterOrganizationEffect').textContent = `$${gameState.blackLineMoneyBonus}`;
         updateDisplay();
     } else {
         alert("Not enough funds to upgrade!");
